@@ -74,10 +74,10 @@ export function SpacejoyExperience() {
     startViewer(event)
   }
 
-  async function handleViewerFailure() {
+  async function handleViewerFailure(session: number) {
+    if (session !== viewerSession.current) return
     if (failureInFlight.current) return
     failureInFlight.current = true
-    const session = viewerSession.current
 
     if (!reducedMotion && activationModality === 'pointer') {
       const viewer = scope.current?.querySelector<HTMLElement>('[data-viewer-layer]')
@@ -97,6 +97,7 @@ export function SpacejoyExperience() {
   }
 
   const activePerspective = spacejoyStory.perspectives[perspective]
+  const activeViewerSession = viewerSession.current
   const canStart = webGL === true && !reducedMotion
   const viewerActive = viewerEnabled && !reducedMotion
   const fallbackReason = reducedMotion
@@ -203,7 +204,7 @@ export function SpacejoyExperience() {
           <ViewerErrorBoundary
             fallback={<div className={styles.posterError}>{fallbackReason}</div>}
             key={retryKey}
-            onError={() => void handleViewerFailure()}
+            onError={() => void handleViewerFailure(activeViewerSession)}
           >
             <div
               aria-hidden={!viewerReady}
@@ -214,7 +215,7 @@ export function SpacejoyExperience() {
               data-viewer-layer
             >
               <DynamicViewer
-                onError={() => void handleViewerFailure()}
+                onError={() => void handleViewerFailure(activeViewerSession)}
                 onReady={() => setViewerReady(true)}
                 paused={viewerPaused}
                 perspective={perspective}

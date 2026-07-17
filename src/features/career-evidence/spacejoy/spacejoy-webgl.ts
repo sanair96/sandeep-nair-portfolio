@@ -1,11 +1,19 @@
+let cachedSupport: boolean | undefined
+
 export function supportsWebGL() {
+  if (cachedSupport !== undefined) return cachedSupport
+
   try {
     const canvas = document.createElement('canvas')
-    return Boolean(
-      window.WebGLRenderingContext &&
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')),
-    )
+    const context =
+      canvas.getContext('webgl') ??
+      (canvas.getContext('experimental-webgl') as WebGLRenderingContext | null)
+
+    cachedSupport = Boolean(window.WebGLRenderingContext && context)
+    context?.getExtension('WEBGL_lose_context')?.loseContext()
+    return cachedSupport
   } catch {
-    return false
+    cachedSupport = false
+    return cachedSupport
   }
 }
