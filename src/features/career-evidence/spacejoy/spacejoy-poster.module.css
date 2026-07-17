@@ -1,0 +1,81 @@
+.poster {
+  background:
+    linear-gradient(90deg, transparent 72%, rgb(49 89 217 / 8%) 72% 72.15%, transparent 72.15%),
+    linear-gradient(0deg, transparent 34%, rgb(21 33 29 / 12%) 34% 34.15%, transparent 34.15%),
+    #f1f3ef;
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.poster img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.posterArtwork {
+  inset: 10% 8% 14%;
+  position: absolute;
+}
+
+.roomFloor,
+.roomWall,
+.sofa,
+.table {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(30deg) skewX(-30deg) scaleY(0.86);
+}
+
+.roomFloor {
+  background: #e2e7df;
+  border: 1px solid #c2cbc1;
+  height: 48%;
+  width: 70%;
+}
+
+.roomWall {
+  background: rgb(255 255 255 / 66%);
+  border: 1px solid #cdd3cb;
+  height: 40%;
+  top: 32%;
+  width: 68%;
+}
+
+.sofa {
+  background: var(--color-cobalt);
+  box-shadow: 0.85rem -0.85rem 0 #6f87df;
+  height: 18%;
+  left: 49%;
+  top: 58%;
+  width: 34%;
+}
+
+.table {
+  background: var(--color-green);
+  height: 12%;
+  left: 67%;
+  top: 69%;
+  width: 16%;
+}
+
+.annotation {
+  background: rgb(255 254 251 / 92%);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 700;
+  left: 1.75rem;
+  letter-spacing: 0.07em;
+  max-width: calc(100% - 3.5rem);
+  padding: 0.625rem 0.75rem;
+  position: absolute;
+  text-transform: uppercase;
+  top: 1.75rem;
+  z-index: 2;
+}

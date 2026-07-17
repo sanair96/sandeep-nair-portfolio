@@ -1,0 +1,46 @@
+{
+  "name": "sandeep-nair-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.13.1",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "generate:model": "node scripts/generate-spacejoy-model.mjs",
+    "check:file-limits": "node scripts/check-file-limits.mjs",
+    "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run check:file-limits",
+    "test:e2e": "playwright test",
+    "test:accessibility": "playwright test tests/e2e/accessibility.spec.ts",
+    "test:visual": "playwright test tests/e2e/visual-regression.spec.ts",
+    "verify": "pnpm run check && pnpm run build && pnpm run test:e2e"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.2",
+    "motion": "^12.42.2",
+    "next": "16.2.9",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "three": "^0.181.2"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.6",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.181.0",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "16.2.9",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}

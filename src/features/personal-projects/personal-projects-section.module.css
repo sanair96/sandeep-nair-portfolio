@@ -1,0 +1,30 @@
+.section {
+  scroll-margin-top: 2rem;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-paper);
+}
+
+.container {
+  display: grid;
+  gap: 3.625rem;
+  padding-block: clamp(5rem, 8.2vw, 7.375rem);
+}
+
+.projects {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .projects {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .container {
+    gap: 2.75rem;
+    padding-block: 4rem;
+  }
+}

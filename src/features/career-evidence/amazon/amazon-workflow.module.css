@@ -1,0 +1,286 @@
+.visual {
+  background: var(--color-deep-2);
+  border-right: 1px solid #31423b;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  padding: 2.375rem;
+}
+
+.toolbar {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.toolbar > p,
+.caption,
+.reducedMotionNote {
+  color: #91a49b;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.tabs {
+  background: #22342c;
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+.tab {
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: #91a49b;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.5625rem 0.9375rem;
+  text-transform: uppercase;
+}
+
+.tab[aria-selected='true'] {
+  background: var(--color-green);
+  color: var(--color-white);
+}
+
+.motionPanels {
+  display: grid;
+  flex: 1;
+}
+
+.activePanel,
+.inactivePanel {
+  grid-area: 1 / 1;
+}
+
+.motionPanels[data-animate='true'] .activePanel,
+.motionPanels[data-animate='true'] .inactivePanel {
+  transition:
+    opacity var(--duration-enter) var(--ease-out),
+    transform var(--duration-enter) var(--ease-out);
+}
+
+.activePanel {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+}
+
+.inactivePanel {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 0.5rem, 0);
+  visibility: hidden;
+}
+
+.beforePanel,
+.afterPanel {
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 1rem;
+  height: 100%;
+  padding: 1.5rem;
+}
+
+.beforePanel {
+  background: var(--color-deep-3);
+  border: 1px solid #35483f;
+}
+
+.afterPanel {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.panelHeader {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.panelHeader p,
+.panelHeader strong {
+  color: #91a49b;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.afterPanel .panelHeader p,
+.afterPanel .panelHeader strong {
+  color: var(--color-green);
+}
+
+.beforePanel h4,
+.afterPanel h4 {
+  font-size: clamp(1.0625rem, 2vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+  max-width: 34rem;
+}
+
+.beforePanel h4 {
+  color: #e6efea;
+}
+
+.steps {
+  align-items: stretch;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.steps li {
+  align-items: center;
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 0.625rem;
+  min-width: 0;
+  padding: 0.875rem 0.75rem;
+  position: relative;
+}
+
+.steps li:not(:last-child)::after {
+  color: #91a49b;
+  content: '→';
+  font-family: var(--font-mono);
+  position: absolute;
+  right: -0.625rem;
+  z-index: 1;
+}
+
+.beforePanel .steps li {
+  background: #22342c;
+}
+
+.afterPanel .steps li {
+  background: #eef0eb;
+  border: 1px solid #d9ddd6;
+}
+
+.afterPanel .steps li:last-child {
+  background: #e5f1eb;
+  border-color: #b5d3c5;
+}
+
+.steps span,
+.steps strong {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.steps span {
+  color: #91a49b;
+}
+
+.beforePanel .steps strong {
+  color: #d6e1db;
+}
+
+.afterPanel .steps strong {
+  color: var(--color-ink);
+}
+
+.afterPanel .steps span {
+  color: var(--color-green);
+}
+
+.caption {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 450;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.reducedMotionNote {
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-transform: none;
+}
+
+.staticPanels {
+  display: none;
+}
+
+.noScriptPanels {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (max-width: 68rem) {
+  .visual {
+    border-right: 0;
+  }
+}
+
+@media (max-width: 48rem) {
+  .visual {
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  .toolbar {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .toolbar > p {
+    display: none;
+  }
+
+  .tabs {
+    width: 100%;
+  }
+
+  .tab {
+    flex: 1;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .steps li:not(:last-child)::after {
+    bottom: -0.75rem;
+    content: '↓';
+    left: 50%;
+    right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabs,
+  .motionPanels {
+    display: none;
+  }
+
+  .staticPanels {
+    display: grid;
+    gap: 0.75rem;
+  }
+}

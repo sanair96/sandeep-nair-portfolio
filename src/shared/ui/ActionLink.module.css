@@ -1,0 +1,95 @@
+.link {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.8rem 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1;
+  text-decoration: none;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    background-color var(--duration-feedback) var(--ease-out),
+    border-color var(--duration-feedback) var(--ease-out),
+    color var(--duration-feedback) var(--ease-out),
+    transform var(--duration-release) var(--ease-out);
+}
+
+.link:active:not(:focus-visible) {
+  transform: translate3d(0, 0, 0) scale(0.98);
+  transition:
+    background-color var(--duration-feedback) var(--ease-out),
+    border-color var(--duration-feedback) var(--ease-out),
+    color var(--duration-feedback) var(--ease-out),
+    transform var(--duration-control-press) var(--ease-out);
+}
+
+.link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-cobalt) 35%, transparent);
+  outline-offset: 3px;
+}
+
+.primary {
+  background: var(--color-cobalt, #3159d9);
+  color: #fff;
+}
+
+.primary:active:not(:focus-visible) {
+  background: color-mix(in srgb, var(--color-cobalt, #3159d9) 88%, #000);
+}
+
+.secondary {
+  border-color: var(--color-line, #d4d0c6);
+  background: transparent;
+  color: var(--color-ink, #15211d);
+}
+
+.secondary:active:not(:focus-visible) {
+  border-color: var(--color-ink, #15211d);
+  background: var(--color-paper, #fffefb);
+}
+
+.inverse {
+  border-color: #52675e;
+  color: #fff;
+}
+
+.inverse:active:not(:focus-visible) {
+  border-color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .link:hover {
+    transform: translate3d(0, -1px, 0) scale(1);
+  }
+
+  .primary:hover {
+    background: color-mix(in srgb, var(--color-cobalt, #3159d9) 88%, #000);
+  }
+
+  .secondary:hover {
+    border-color: var(--color-ink, #15211d);
+    background: var(--color-paper, #fffefb);
+  }
+
+  .inverse:hover {
+    border-color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .link:hover,
+  .link:active:not(:focus-visible) {
+    transform: none;
+    transition:
+      background-color var(--duration-feedback) var(--ease-out),
+      border-color var(--duration-feedback) var(--ease-out),
+      color var(--duration-feedback) var(--ease-out) !important;
+  }
+}

@@ -1,0 +1,13 @@
+.next/
+.pnpm-store/
+coverage/
+node_modules/
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.log
+.DS_Store
+*-chromium-darwin.png
+.vercel
+.env*
+!.env.example

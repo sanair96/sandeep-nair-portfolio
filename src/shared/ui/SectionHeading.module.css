@@ -1,0 +1,58 @@
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  align-items: end;
+  gap: clamp(3rem, 14vw, 13rem);
+}
+
+.titleGroup {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.eyebrow {
+  color: var(--color-cobalt, #3159d9);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 48rem;
+  font-size: clamp(2.375rem, 3.35vw, 3rem);
+  font-weight: 620;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.description {
+  color: var(--color-muted, #66706b);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+@media (max-width: 800px) {
+  .header {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .description {
+    max-width: 38rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2.125rem;
+  }
+
+  .description {
+    font-size: 0.9375rem;
+  }
+}

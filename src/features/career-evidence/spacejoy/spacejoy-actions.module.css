@@ -1,0 +1,90 @@
+.primaryAction,
+.secondaryAction {
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  min-height: 2.5rem;
+  padding: 0.625rem 0.875rem;
+  text-transform: uppercase;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    background-color var(--duration-feedback) var(--ease-out),
+    border-color var(--duration-feedback) var(--ease-out),
+    color var(--duration-feedback) var(--ease-out),
+    transform var(--duration-release) var(--ease-out);
+}
+
+.primaryAction {
+  background: var(--color-cobalt);
+  border: 1px solid var(--color-cobalt);
+  color: var(--color-white);
+}
+
+.primaryAction:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.secondaryAction {
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
+}
+
+.secondaryAction:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.primaryAction:not(:disabled):active:not(:focus-visible),
+.secondaryAction:not(:disabled):active:not(:focus-visible) {
+  transform: translate3d(0, 0, 0) scale(0.98);
+  transition:
+    background-color var(--duration-feedback) var(--ease-out),
+    border-color var(--duration-feedback) var(--ease-out),
+    color var(--duration-feedback) var(--ease-out),
+    transform var(--duration-control-press) var(--ease-out);
+}
+
+.primaryAction:not(:disabled):active:not(:focus-visible) {
+  background: var(--color-cobalt-dark);
+  border-color: var(--color-cobalt-dark);
+}
+
+.secondaryAction:not(:disabled):active:not(:focus-visible) {
+  border-color: var(--color-ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .primaryAction:not(:disabled):hover,
+  .secondaryAction:not(:disabled):hover {
+    transform: translate3d(0, -1px, 0) scale(1);
+  }
+
+  .primaryAction:not(:disabled):hover {
+    background: var(--color-cobalt-dark);
+    border-color: var(--color-cobalt-dark);
+  }
+
+  .secondaryAction:not(:disabled):hover {
+    border-color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryAction,
+  .secondaryAction,
+  .primaryAction:not(:disabled):hover,
+  .secondaryAction:not(:disabled):hover,
+  .primaryAction:not(:disabled):active:not(:focus-visible),
+  .secondaryAction:not(:disabled):active:not(:focus-visible) {
+    transform: none;
+    transition:
+      background-color var(--duration-feedback) var(--ease-out),
+      border-color var(--duration-feedback) var(--ease-out),
+      color var(--duration-feedback) var(--ease-out) !important;
+  }
+}
