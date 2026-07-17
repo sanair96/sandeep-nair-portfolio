@@ -18,9 +18,11 @@
     "check:file-limits": "node scripts/check-file-limits.mjs",
     "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run check:file-limits",
     "test:e2e": "playwright test",
+    "test:e2e:ci": "playwright test --ignore-snapshots",
     "test:accessibility": "playwright test tests/e2e/accessibility.spec.ts",
     "test:visual": "playwright test tests/e2e/visual-regression.spec.ts",
-    "verify": "pnpm run check && pnpm run build && pnpm run test:e2e"
+    "verify": "pnpm run check && pnpm run build && pnpm run test:e2e",
+    "verify:ci": "pnpm run check && pnpm run build && pnpm run test:e2e:ci"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

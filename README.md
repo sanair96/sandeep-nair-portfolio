@@ -36,11 +36,14 @@ site URL or run Playwright against an external deployment. Never commit
 pnpm check
 pnpm build
 pnpm test:e2e
+pnpm test:visual
 pnpm verify
 ```
 
 The project also enforces a 300 non-blank-line ceiling for handwritten
-TypeScript, TSX, and CSS files.
+TypeScript, TSX, and CSS files. The committed visual baselines are calibrated
+for macOS Chromium; Linux CI runs the same suite with snapshot comparisons
+ignored while retaining all interaction and accessibility assertions.
 
 ## Motion and accessibility
 
