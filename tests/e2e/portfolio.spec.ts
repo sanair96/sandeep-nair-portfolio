@@ -167,7 +167,7 @@ test('keyboard Atlassian task selection is immediate', async ({ page }) => {
     .toBe(0)
 })
 
-test('keeps the Spacejoy viewer behind an explicit action', async ({ page }) => {
+test('auto-loads the Spacejoy room without interaction', async ({ page }) => {
   const browserErrors: string[] = []
   page.on('console', (message) => {
     if (message.type() === 'error') browserErrors.push(message.text())
@@ -176,13 +176,17 @@ test('keeps the Spacejoy viewer behind an explicit action', async ({ page }) => 
 
   await page.goto('/')
 
-  const activate = page.getByRole('button', { name: /view in 3d/i })
-  await expect(activate).toBeVisible()
-  await expect(page.locator('canvas')).toHaveCount(0)
-
-  await activate.click()
-  await expect(page.getByRole('button', { name: /pause 3d|resume 3d/i })).toBeVisible()
+  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  await viewerPanel.scrollIntoViewIfNeeded()
+  await expect(page.getByRole('button', { name: /view in 3d/i })).toHaveCount(0)
+  await expect(
+    page.getByRole('button', { name: /pause room build|resume room build/i }),
+  ).toBeVisible()
   await expect(page.locator('canvas')).toBeVisible()
+  await expect(viewerPanel.locator('[data-viewer-layer]')).toHaveAttribute(
+    'data-activation',
+    'automatic',
+  )
   expect(browserErrors).toEqual([])
 })
 

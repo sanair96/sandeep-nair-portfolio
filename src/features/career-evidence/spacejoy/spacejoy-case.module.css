@@ -197,6 +197,14 @@
   pointer-events: auto;
 }
 
+.viewerLayer[data-build='complete'] canvas {
+  cursor: grab;
+}
+
+.viewerLayer[data-build='complete'] canvas:active {
+  cursor: grabbing;
+}
+
 .loading,
 .viewerLoading {
   align-items: center;

@@ -25,27 +25,29 @@ const getServerWebGLSnapshot = () => null
 const getWebGLSnapshot = () => supportsWebGL()
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
-type ActivationModality = 'keyboard' | 'pointer'
-
 export function SpacejoyExperience() {
   const id = useId()
   const [scope, animate] = useAnimate<HTMLDivElement>()
   const tabs = useRef<Array<HTMLButtonElement | null>>([])
+  const viewerAction = useRef<HTMLButtonElement>(null)
   const failureInFlight = useRef(false)
+  const restartInFlight = useRef(false)
+  const restoreActionFocus = useRef(false)
   const viewerSession = useRef(0)
   const [perspective, setPerspective] = useState(1)
+  const [immediatePerspective, setImmediatePerspective] = useState(false)
   const webGL = useSyncExternalStore(noWebGLSubscription, getWebGLSnapshot, getServerWebGLSnapshot)
   const reducedMotion = useReducedMotion()
-  const [viewerEnabled, setViewerEnabled] = useState(false)
   const [viewerReady, setViewerReady] = useState(false)
+  const [buildComplete, setBuildComplete] = useState(false)
   const [paused, setPaused] = useState(false)
   const [failed, setFailed] = useState(false)
   const [retryKey, setRetryKey] = useState(0)
-  const [activationModality, setActivationModality] = useState<ActivationModality>('keyboard')
-  const viewerVisible = useSpacejoyVisibility(scope)
+  const { hasApproached, viewerVisible } = useSpacejoyVisibility(scope)
   const viewerPaused = paused || !viewerVisible
 
   function selectPerspective(index: number) {
+    setImmediatePerspective(true)
     setPerspective(index)
     tabs.current[index]?.focus()
   }
@@ -59,19 +61,28 @@ export function SpacejoyExperience() {
     event.preventDefault()
   }
 
-  function startViewer(event: React.MouseEvent<HTMLButtonElement>) {
+  async function restartViewer() {
+    if (restartInFlight.current) return
+    restartInFlight.current = true
+    restoreActionFocus.current = true
     viewerSession.current += 1
-    setActivationModality(event.detail === 0 ? 'keyboard' : 'pointer')
     failureInFlight.current = false
+
+    if (failed) {
+      try {
+        const { clearSpacejoyModelCache } = await import('./spacejoy-viewer.client')
+        clearSpacejoyModelCache()
+      } finally {
+        restartInFlight.current = false
+      }
+    }
+
     setFailed(false)
     setViewerReady(false)
+    setBuildComplete(false)
     setPaused(false)
-    setViewerEnabled(true)
-  }
-
-  function retryViewer(event: React.MouseEvent<HTMLButtonElement>) {
     setRetryKey((key) => key + 1)
-    startViewer(event)
+    restartInFlight.current = false
   }
 
   async function handleViewerFailure(session: number) {
@@ -79,7 +90,7 @@ export function SpacejoyExperience() {
     if (failureInFlight.current) return
     failureInFlight.current = true
 
-    if (!reducedMotion && activationModality === 'pointer') {
+    if (!reducedMotion) {
       const viewer = scope.current?.querySelector<HTMLElement>('[data-viewer-layer]')
       const loading = scope.current?.querySelector<HTMLElement>('[data-viewer-loading]')
       const exits = [viewer, loading]
@@ -98,8 +109,8 @@ export function SpacejoyExperience() {
 
   const activePerspective = spacejoyStory.perspectives[perspective]
   const activeViewerSession = viewerSession.current
-  const canStart = webGL === true && !reducedMotion
-  const viewerActive = viewerEnabled && !reducedMotion
+  const viewerAvailable = webGL === true && !reducedMotion
+  const viewerActive = viewerAvailable && !failed && hasApproached
   const fallbackReason = reducedMotion
     ? 'Static view shown because reduced motion is enabled.'
     : webGL === false
@@ -120,7 +131,7 @@ export function SpacejoyExperience() {
 
       failureInFlight.current = false
       setViewerReady(false)
-      setViewerEnabled(false)
+      setBuildComplete(false)
       setPaused(false)
       setFailed(false)
     }
@@ -134,14 +145,6 @@ export function SpacejoyExperience() {
     const viewer = scope.current?.querySelector<HTMLElement>('[data-viewer-layer]')
     const loading = scope.current?.querySelector<HTMLElement>('[data-viewer-loading]')
     if (!viewer || !viewerReady) return
-
-    if (activationModality === 'keyboard' || reducedMotion) {
-      scope.current?.getAnimations({ subtree: true }).forEach((animation) => animation.cancel())
-      viewer.style.opacity = '1'
-      viewer.style.transform = 'scale3d(1, 1, 1)'
-      if (loading) loading.style.opacity = '0'
-      return
-    }
 
     void animate(
       viewer,
@@ -158,7 +161,13 @@ export function SpacejoyExperience() {
         { duration: motionDuration.exit, ease: motionEase.out },
       )
     }
-  }, [activationModality, animate, failed, reducedMotion, scope, viewerActive, viewerReady])
+  }, [animate, failed, scope, viewerActive, viewerReady])
+
+  useEffect(() => {
+    if (!viewerReady || !restoreActionFocus.current) return
+    restoreActionFocus.current = false
+    viewerAction.current?.focus()
+  }, [viewerReady])
 
   return (
     <div className={styles.experience} ref={scope}>
@@ -171,7 +180,10 @@ export function SpacejoyExperience() {
               className={styles.perspective}
               id={`${id}-tab-${item.id}`}
               key={item.id}
-              onClick={() => setPerspective(index)}
+              onClick={(event) => {
+                setImmediatePerspective(event.detail === 0)
+                setPerspective(index)
+              }}
               onKeyDown={(event) => handleTabKey(event, index)}
               ref={(node) => {
                 tabs.current[index] = node
@@ -209,14 +221,18 @@ export function SpacejoyExperience() {
             <div
               aria-hidden={!viewerReady}
               className={styles.viewerLayer}
-              data-activation={activationModality}
+              data-activation="automatic"
+              data-build={buildComplete ? 'complete' : 'assembling'}
+              data-perspective-transition={immediatePerspective ? 'instant' : 'animated'}
               data-ready={viewerReady}
               data-rendering={viewerPaused ? 'paused' : 'active'}
               data-viewer-layer
             >
               <DynamicViewer
+                immediatePerspective={immediatePerspective}
                 onError={() => void handleViewerFailure(activeViewerSession)}
                 onReady={() => setViewerReady(true)}
+                onSequenceComplete={() => setBuildComplete(true)}
                 paused={viewerPaused}
                 perspective={perspective}
               />
@@ -236,35 +252,47 @@ export function SpacejoyExperience() {
       </div>
 
       <div className={styles.actions}>
-        {!viewerActive || failed ? (
+        {failed ? (
           <button
             className={actionStyles.primaryAction}
-            disabled={!canStart}
-            onClick={(event) => (failed ? retryViewer(event) : startViewer(event))}
+            disabled={!viewerAvailable}
+            onClick={() => void restartViewer()}
+            ref={viewerAction}
             type="button"
           >
-            {failed ? 'Retry 3D' : spacejoyStory.viewer.actionLabel}
+            Retry 3D
           </button>
-        ) : (
+        ) : viewerActive ? (
           <button
             className={actionStyles.secondaryAction}
             disabled={!viewerReady}
-            onClick={() => setPaused((value) => !value)}
+            onClick={() => (buildComplete ? void restartViewer() : setPaused((value) => !value))}
+            ref={viewerAction}
             type="button"
           >
-            {viewerReady ? (paused ? 'Resume 3D' : 'Pause 3D') : 'Loading 3D…'}
+            {!viewerReady
+              ? 'Loading 3D…'
+              : buildComplete
+                ? 'Replay room build'
+                : paused
+                  ? 'Resume room build'
+                  : spacejoyStory.viewer.pauseLabel}
           </button>
-        )}
+        ) : null}
         <p aria-live="polite" className={styles.status}>
           {failed
             ? 'The model could not load. The poster remains available.'
             : !viewerActive
-              ? fallbackReason
+              ? webGL === null
+                ? 'Preparing the interactive room…'
+                : fallbackReason
               : !viewerReady
                 ? 'Loading the room model…'
-                : paused
-                  ? '3D view paused.'
-                  : '3D view ready. Drag to orbit.'}
+                : buildComplete
+                  ? 'Room complete. Drag to orbit or replay the build.'
+                  : paused
+                    ? 'Room build paused.'
+                    : 'Building the room, one object at a time…'}
         </p>
       </div>
 

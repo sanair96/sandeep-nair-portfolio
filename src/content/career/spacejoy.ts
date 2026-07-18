@@ -38,15 +38,14 @@ export const spacejoyStory = {
     },
   ],
   viewer: {
-    label: 'Three.js viewer / contained',
+    label: 'Live Three.js room / auto-building',
     posterSrc: '/images/spacejoy-poster.webp',
     modelSrc: '/models/spacejoy-showcase.glb',
-    actionLabel: 'View in 3D',
-    pauseLabel: 'Pause 3D',
+    pauseLabel: 'Pause room build',
     fallbackCopy: 'The static view still explains the role and workflow.',
     errorCopy: 'The interactive model is unavailable, so the static view is shown instead.',
   },
-  caption: 'Drag to orbit · switch role perspective · inspect product',
+  caption: 'Watch the room assemble · orbit the finished space · switch role perspective',
   interactionNote:
-    'Orbit is available, not required. The static view still explains the role and workflow.',
+    'The build pauses offscreen. Once complete, drag to inspect the furnished room from another angle.',
 } as const satisfies SpacejoyStory

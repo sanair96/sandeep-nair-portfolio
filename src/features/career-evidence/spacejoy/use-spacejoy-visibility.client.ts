@@ -16,19 +16,33 @@ export function useSpacejoyVisibility(scope: RefObject<HTMLElement | null>) {
     getDocumentVisibility,
     getServerDocumentVisibility,
   )
-  const [inViewport, setInViewport] = useState(true)
+  const [inViewport, setInViewport] = useState(false)
+  const [hasApproached, setHasApproached] = useState(false)
 
   useEffect(() => {
     const element = scope.current
     if (!element) return
 
-    const observer = new IntersectionObserver(
+    const visibilityObserver = new IntersectionObserver(
       ([entry]) => setInViewport(entry?.isIntersecting ?? false),
       { threshold: 0.05 },
     )
-    observer.observe(element)
-    return () => observer.disconnect()
+    const approachObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setHasApproached(true)
+      },
+      { rootMargin: '700px 0px', threshold: 0 },
+    )
+    visibilityObserver.observe(element)
+    approachObserver.observe(element)
+    return () => {
+      visibilityObserver.disconnect()
+      approachObserver.disconnect()
+    }
   }, [scope])
 
-  return documentVisible && inViewport
+  return {
+    hasApproached,
+    viewerVisible: documentVisible && inViewport,
+  }
 }

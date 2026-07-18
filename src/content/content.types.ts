@@ -88,7 +88,6 @@ export interface SpacejoyViewer {
   readonly label: string
   readonly posterSrc: string
   readonly modelSrc: string
-  readonly actionLabel: string
   readonly pauseLabel: string
   readonly fallbackCopy: string
   readonly errorCopy: string

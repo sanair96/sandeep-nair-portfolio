@@ -10,6 +10,17 @@ test('has no automatically detectable accessibility violations', async ({ page }
   expect(results.violations).toEqual([])
 })
 
+test('has no detectable violations with the live room ready', async ({ page }) => {
+  await page.goto('/')
+
+  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  await viewerPanel.scrollIntoViewIfNeeded()
+  await expect(page.getByRole('button', { name: 'Pause room build' })).toBeVisible()
+  const results = await new AxeBuilder({ page }).analyze()
+
+  expect(results.violations).toEqual([])
+})
+
 test('rests the Queans pipeline on human review with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
@@ -50,5 +61,5 @@ test('keeps the Atlassian task controls usable with reduced motion', async ({ pa
   await verify.click()
   await expect(verify).toHaveAttribute('aria-pressed', 'true')
   await expect(loop.getByText(/Check each pattern against ticket context/i)).toBeVisible()
-  await expect(page.getByText(/Three\.js viewer \/ contained/i)).toBeVisible()
+  await expect(page.getByText(/Live Three\.js room \/ auto-building/i)).toBeVisible()
 })

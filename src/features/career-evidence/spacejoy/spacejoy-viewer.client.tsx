@@ -1,12 +1,18 @@
 'use client'
 
 import { Canvas, useThree } from '@react-three/fiber'
-import { Center, ContactShadows, OrbitControls, useGLTF } from '@react-three/drei'
-import { Suspense, useEffect, useMemo } from 'react'
+import { OrbitControls } from '@react-three/drei'
+import { Suspense, useEffect, useState } from 'react'
+
+import { SpacejoyRoomBuild } from './spacejoy-room-build.client'
+
+export { clearSpacejoyModelCache } from './spacejoy-room-build.client'
 
 type ViewerProps = {
+  immediatePerspective: boolean
   onError: () => void
   onReady: () => void
+  onSequenceComplete: () => void
   paused: boolean
   perspective: number
 }
@@ -27,50 +33,55 @@ function ContextObserver({ onError }: { onError: () => void }) {
   return null
 }
 
-function RoomModel({ onReady, perspective }: { onReady: () => void; perspective: number }) {
-  const { scene } = useGLTF('/models/spacejoy-showcase.glb')
-  const model = useMemo(() => scene.clone(), [scene])
-  const rotations = [0.16, -0.18, 0.34]
+export default function SpacejoyViewer({
+  immediatePerspective,
+  onError,
+  onReady,
+  onSequenceComplete,
+  paused,
+  perspective,
+}: ViewerProps) {
+  const [sequenceComplete, setSequenceComplete] = useState(false)
 
-  useEffect(() => {
-    onReady()
-  }, [onReady])
+  function handleSequenceComplete() {
+    setSequenceComplete(true)
+    onSequenceComplete()
+  }
 
-  return (
-    <Center>
-      <primitive object={model} rotation={[0, rotations[perspective] ?? 0, 0]} scale={1.35} />
-    </Center>
-  )
-}
-
-export default function SpacejoyViewer({ onError, onReady, paused, perspective }: ViewerProps) {
   return (
     <Canvas
-      camera={{ fov: 38, position: [3.5, 2.8, 4.8] }}
+      camera={{ far: 100, fov: 33, near: 0.1, position: [5.6, 3.3, 6.2] }}
       dpr={[1, 1.5]}
-      frameloop={paused ? 'never' : 'always'}
+      frameloop={paused ? 'never' : sequenceComplete ? 'demand' : 'always'}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
+      shadows
     >
-      <color args={['#f1f3ef']} attach="background" />
-      <ambientLight intensity={1.5} />
-      <directionalLight intensity={2.2} position={[4, 6, 3]} />
+      <color args={['#ede9df']} attach="background" />
+      <hemisphereLight args={['#fff7e8', '#53685f', 1.15]} />
+      <ambientLight intensity={0.55} />
+      <directionalLight castShadow intensity={2.4} position={[4.5, 6, 5]} shadow-bias={-0.0004} />
+      <pointLight color="#ffd7a1" distance={5} intensity={8} position={[-2, 1.75, 0.5]} />
       <Suspense fallback={null}>
-        <RoomModel onReady={onReady} perspective={perspective} />
-        <ContactShadows blur={2.5} far={4} opacity={0.28} position={[0, -1.1, 0]} scale={7} />
+        <SpacejoyRoomBuild
+          immediatePerspective={immediatePerspective}
+          onReady={onReady}
+          onSequenceComplete={handleSequenceComplete}
+          perspective={perspective}
+        />
       </Suspense>
       <OrbitControls
-        autoRotate={!paused}
-        autoRotateSpeed={0.35}
-        enableDamping={!paused}
+        enableDamping={!paused && sequenceComplete}
         enablePan={false}
-        enabled={!paused}
-        maxDistance={8}
-        maxPolarAngle={Math.PI / 2.05}
-        minDistance={2.5}
+        enabled={!paused && sequenceComplete}
+        maxAzimuthAngle={Math.PI / 2.8}
+        maxDistance={17}
+        maxPolarAngle={Math.PI / 2.15}
+        minAzimuthAngle={-Math.PI / 3}
+        minDistance={5}
+        minPolarAngle={Math.PI / 4.3}
+        target={[0, -0.08, -0.05]}
       />
       <ContextObserver onError={onError} />
     </Canvas>
   )
 }
-
-useGLTF.preload('/models/spacejoy-showcase.glb')
