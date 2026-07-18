@@ -85,16 +85,27 @@ export interface AmazonStory extends CareerStoryBase {
 }
 
 export interface SpacejoyViewer {
+  readonly ariaLabel: string
   readonly label: string
   readonly posterSrc: string
+  readonly posterLabel: string
+  readonly posterSummary: string
   readonly modelSrc: string
   readonly pauseLabel: string
   readonly fallbackCopy: string
   readonly errorCopy: string
 }
 
+export interface SpacejoySurface {
+  readonly id: string
+  readonly label: string
+  readonly summary: string
+}
+
 export interface SpacejoyStory extends CareerStoryBase {
-  readonly perspectives: readonly EvidenceState[]
+  readonly surfacesLabel: string
+  readonly surfacesTitle: string
+  readonly surfaces: readonly SpacejoySurface[]
   readonly viewer: SpacejoyViewer
   readonly caption: string
   readonly interactionNote: string

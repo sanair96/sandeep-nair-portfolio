@@ -9,7 +9,7 @@ test('keeps the Spacejoy poster present until the 3D viewer is ready', async ({ 
   })
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await expect(page.locator('canvas')).toHaveCount(0)
   expect(modelRequests).toBe(0)
   await viewerPanel.scrollIntoViewIfNeeded()
@@ -32,7 +32,7 @@ test('keeps the Spacejoy poster present until the 3D viewer is ready', async ({ 
 test('automatically builds the Spacejoy room and supports keyboard replay', async ({ page }) => {
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   const viewerLayer = viewerPanel.locator('[data-viewer-layer]')
   await viewerPanel.scrollIntoViewIfNeeded()
 
@@ -54,25 +54,6 @@ test('automatically builds the Spacejoy room and supports keyboard replay', asyn
   await expect(viewerLayer).toHaveAttribute('data-build', 'assembling')
 })
 
-test('keeps keyboard perspective changes immediate during the room build', async ({ page }) => {
-  await page.goto('/')
-
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
-  await viewerPanel.scrollIntoViewIfNeeded()
-  await expect(page.getByRole('button', { name: 'Pause room build' })).toBeVisible()
-  const viewerLayer = page.locator('[data-viewer-layer]')
-  const designer = page.getByRole('tab', { name: 'Designer' })
-  const artist = page.getByRole('tab', { name: '3D artist' })
-  await designer.focus()
-  await designer.press('ArrowRight')
-
-  await expect(artist).toHaveAttribute('aria-selected', 'true')
-  await expect(viewerLayer).toHaveAttribute('data-perspective-transition', 'instant')
-
-  await page.getByRole('tab', { name: 'Customer' }).click()
-  await expect(viewerLayer).toHaveAttribute('data-perspective-transition', 'animated')
-})
-
 test('keeps the Spacejoy 3D enhancement disabled with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
@@ -80,7 +61,9 @@ test('keeps the Spacejoy 3D enhancement disabled with reduced motion', async ({ 
   await expect(page.getByRole('button', { name: /view in 3d/i })).toHaveCount(0)
   await expect(page.getByText('Static view shown because reduced motion is enabled.')).toBeVisible()
   await expect(page.locator('canvas')).toHaveCount(0)
-  await expect(page.getByRole('tabpanel', { name: /designer/i }).locator('img')).toBeVisible()
+  await expect(
+    page.getByRole('region', { name: /spacejoy 3d room build/i }).locator('img'),
+  ).toBeVisible()
 })
 
 test('keeps the Spacejoy poster when WebGL is unavailable', async ({ page }) => {
@@ -92,7 +75,7 @@ test('keeps the Spacejoy poster when WebGL is unavailable', async ({ page }) => 
   })
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await expect(page.getByText('Static view shown because WebGL is unavailable.')).toBeVisible()
   await expect(viewerPanel.locator('img')).toBeVisible()
   await expect(viewerPanel.locator('[data-viewer-layer]')).toHaveCount(0)
@@ -102,7 +85,7 @@ test('keeps the Spacejoy poster when WebGL is unavailable', async ({ page }) => 
 test('returns a running viewer to the poster when reduced motion changes', async ({ page }) => {
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await viewerPanel.scrollIntoViewIfNeeded()
   await expect(page.getByRole('button', { name: 'Pause room build' })).toBeVisible()
   await expect(page.locator('canvas')).toBeVisible()
@@ -123,7 +106,7 @@ test('pauses rendering while offscreen or hidden without overriding user pause',
 }) => {
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await viewerPanel.scrollIntoViewIfNeeded()
   const viewerLayer = viewerPanel.locator('[data-viewer-layer]')
   const pause = page.getByRole('button', { name: 'Pause room build' })
@@ -162,7 +145,7 @@ test('pauses rendering while offscreen or hidden without overriding user pause',
 test('preserves the Spacejoy failure and retry path', async ({ page }) => {
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await viewerPanel.scrollIntoViewIfNeeded()
   await expect(page.getByRole('button', { name: 'Pause room build' })).toBeVisible()
   await page.locator('canvas').dispatchEvent('webglcontextlost')
@@ -185,7 +168,7 @@ test('recovers from a transient Spacejoy model download failure', async ({ page 
   })
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await viewerPanel.scrollIntoViewIfNeeded()
   const retry = page.getByRole('button', { name: 'Retry 3D' })
   await expect(retry).toBeVisible()

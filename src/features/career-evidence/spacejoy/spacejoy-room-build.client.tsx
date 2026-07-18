@@ -6,10 +6,8 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Group, MathUtils, Mesh, Object3D, Vector3 } from 'three'
 
 type Props = {
-  immediatePerspective: boolean
   onReady: () => void
   onSequenceComplete: () => void
-  perspective: number
 }
 
 type BuildStage = {
@@ -30,6 +28,7 @@ const REVEAL_DELAY = 0.34
 const REVEAL_DURATION = 0.42
 const FINAL_DURATION = 1.1
 const MODEL_URL = '/models/spacejoy-showcase.glb'
+const DEFAULT_ROOM_ROTATION = -0.12
 
 const INITIAL_VIEW = {
   camera: [5.6, 3.3, 6.2],
@@ -55,8 +54,6 @@ const INITIAL_CAMERA = new Vector3(...INITIAL_VIEW.camera)
 const INITIAL_TARGET = new Vector3(...INITIAL_VIEW.target)
 const FINAL_CAMERA = new Vector3(...FINAL_VIEW.camera)
 const FINAL_TARGET = new Vector3(...FINAL_VIEW.target)
-const PERSPECTIVE_ROTATIONS = [0.12, -0.12, 0.28]
-
 function easeOutBack(value: number) {
   const overshoot = 1.35
   const shifted = value - 1
@@ -91,12 +88,7 @@ function prepareModel(source: Group) {
   return { model, stages }
 }
 
-export function SpacejoyRoomBuild({
-  immediatePerspective,
-  onReady,
-  onSequenceComplete,
-  perspective,
-}: Props) {
+export function SpacejoyRoomBuild({ onReady, onSequenceComplete }: Props) {
   const { scene } = useGLTF(MODEL_URL)
   const { model, stages } = useMemo(() => prepareModel(scene), [scene])
   const modelRef = useRef<Group>(null)
@@ -128,12 +120,10 @@ export function SpacejoyRoomBuild({
 
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05)
-    const desiredRotation = PERSPECTIVE_ROTATIONS[perspective] ?? 0
     if (modelRef.current) {
-      modelRef.current.rotation.y =
-        completed.current || immediatePerspective
-          ? desiredRotation
-          : MathUtils.damp(modelRef.current.rotation.y, desiredRotation, 4, delta)
+      modelRef.current.rotation.y = completed.current
+        ? DEFAULT_ROOM_ROTATION
+        : MathUtils.damp(modelRef.current.rotation.y, DEFAULT_ROOM_ROTATION, 4, delta)
     }
     if (completed.current) return
 

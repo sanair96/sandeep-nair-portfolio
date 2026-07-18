@@ -9,12 +9,10 @@ import { SpacejoyRoomBuild } from './spacejoy-room-build.client'
 export { clearSpacejoyModelCache } from './spacejoy-room-build.client'
 
 type ViewerProps = {
-  immediatePerspective: boolean
   onError: () => void
   onReady: () => void
   onSequenceComplete: () => void
   paused: boolean
-  perspective: number
 }
 
 function ContextObserver({ onError }: { onError: () => void }) {
@@ -34,12 +32,10 @@ function ContextObserver({ onError }: { onError: () => void }) {
 }
 
 export default function SpacejoyViewer({
-  immediatePerspective,
   onError,
   onReady,
   onSequenceComplete,
   paused,
-  perspective,
 }: ViewerProps) {
   const [sequenceComplete, setSequenceComplete] = useState(false)
 
@@ -62,12 +58,7 @@ export default function SpacejoyViewer({
       <directionalLight castShadow intensity={2.4} position={[4.5, 6, 5]} shadow-bias={-0.0004} />
       <pointLight color="#ffd7a1" distance={5} intensity={8} position={[-2, 1.75, 0.5]} />
       <Suspense fallback={null}>
-        <SpacejoyRoomBuild
-          immediatePerspective={immediatePerspective}
-          onReady={onReady}
-          onSequenceComplete={handleSequenceComplete}
-          perspective={perspective}
-        />
+        <SpacejoyRoomBuild onReady={onReady} onSequenceComplete={handleSequenceComplete} />
       </Suspense>
       <OrbitControls
         enableDamping={!paused && sequenceComplete}

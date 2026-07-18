@@ -176,7 +176,7 @@ test('auto-loads the Spacejoy room without interaction', async ({ page }) => {
 
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await viewerPanel.scrollIntoViewIfNeeded()
   await expect(page.getByRole('button', { name: /view in 3d/i })).toHaveCount(0)
   await expect(
@@ -188,6 +188,19 @@ test('auto-loads the Spacejoy room without interaction', async ({ page }) => {
     'automatic',
   )
   expect(browserErrors).toEqual([])
+})
+
+test('presents the Spacejoy work as four static product surfaces', async ({ page }) => {
+  await page.goto('/')
+
+  const surfaces = page.getByRole('region', { name: 'What I built across the platform' })
+  await surfaces.scrollIntoViewIfNeeded()
+
+  await expect(surfaces.getByText('Customer experience', { exact: true })).toBeVisible()
+  await expect(surfaces.getByText('Internal CMS', { exact: true })).toBeVisible()
+  await expect(surfaces.getByText('Designer view', { exact: true })).toBeVisible()
+  await expect(surfaces.getByText('3D visualization', { exact: true })).toBeVisible()
+  await expect(page.getByRole('tab', { name: 'Designer', exact: true })).toHaveCount(0)
 })
 
 test('provides working public contact links', async ({ page }) => {

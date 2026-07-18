@@ -13,7 +13,7 @@ test('has no automatically detectable accessibility violations', async ({ page }
 test('has no detectable violations with the live room ready', async ({ page }) => {
   await page.goto('/')
 
-  const viewerPanel = page.getByRole('tabpanel', { name: /designer/i })
+  const viewerPanel = page.getByRole('region', { name: /spacejoy 3d room build/i })
   await viewerPanel.scrollIntoViewIfNeeded()
   await expect(page.getByRole('button', { name: 'Pause room build' })).toBeVisible()
   const results = await new AxeBuilder({ page }).analyze()

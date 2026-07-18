@@ -109,35 +109,7 @@
 .toolbar {
   align-items: center;
   display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-}
-
-.perspectives {
-  background: #eef0eb;
-  border-radius: var(--radius-md);
-  display: flex;
-  gap: 0.25rem;
-  padding: 0.25rem;
-}
-
-.perspective {
-  background: transparent;
-  border: 0;
-  border-radius: var(--radius-sm);
-  color: var(--color-muted);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  padding: 0.5625rem 0.75rem;
-  text-transform: uppercase;
-}
-
-.perspective[aria-selected='true'] {
-  background: var(--color-cobalt);
-  color: var(--color-white);
+  justify-content: flex-end;
 }
 
 .viewerNote,
@@ -258,6 +230,11 @@
   text-transform: none;
 }
 
+.viewerDescription {
+  display: grid;
+  gap: 0.375rem;
+}
+
 @media (max-width: 68rem) {
   .case {
     grid-template-columns: 1fr;
@@ -286,21 +263,7 @@
   }
 
   .toolbar {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .viewerNote {
-    display: none;
-  }
-
-  .perspectives {
-    width: 100%;
-  }
-
-  .perspective {
-    flex: 1;
-    padding-inline: 0.25rem;
+    justify-content: flex-start;
   }
 
   .viewerShell {

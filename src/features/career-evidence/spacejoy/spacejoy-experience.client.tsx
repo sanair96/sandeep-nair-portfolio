@@ -2,7 +2,7 @@
 
 import { useAnimate } from 'motion/react-mini'
 import dynamic from 'next/dynamic'
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { spacejoyStory } from '@/content/career/spacejoy'
 import { motionDuration, motionEase } from '@/shared/motion/motion.constants'
@@ -11,6 +11,7 @@ import { useReducedMotion } from '@/shared/motion/use-reduced-motion.client'
 import actionStyles from './spacejoy-actions.module.css'
 import styles from './spacejoy-case.module.css'
 import { SpacejoyPoster } from './spacejoy-poster.client'
+import surfaceStyles from './spacejoy-surfaces.module.css'
 import { supportsWebGL } from './spacejoy-webgl'
 import { useSpacejoyVisibility } from './use-spacejoy-visibility.client'
 import { ViewerErrorBoundary } from './viewer-error-boundary.client'
@@ -26,16 +27,12 @@ const getWebGLSnapshot = () => supportsWebGL()
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
 
 export function SpacejoyExperience() {
-  const id = useId()
   const [scope, animate] = useAnimate<HTMLDivElement>()
-  const tabs = useRef<Array<HTMLButtonElement | null>>([])
   const viewerAction = useRef<HTMLButtonElement>(null)
   const failureInFlight = useRef(false)
   const restartInFlight = useRef(false)
   const restoreActionFocus = useRef(false)
   const viewerSession = useRef(0)
-  const [perspective, setPerspective] = useState(1)
-  const [immediatePerspective, setImmediatePerspective] = useState(false)
   const webGL = useSyncExternalStore(noWebGLSubscription, getWebGLSnapshot, getServerWebGLSnapshot)
   const reducedMotion = useReducedMotion()
   const [viewerReady, setViewerReady] = useState(false)
@@ -45,21 +42,6 @@ export function SpacejoyExperience() {
   const [retryKey, setRetryKey] = useState(0)
   const { hasApproached, viewerVisible } = useSpacejoyVisibility(scope)
   const viewerPaused = paused || !viewerVisible
-
-  function selectPerspective(index: number) {
-    setImmediatePerspective(true)
-    setPerspective(index)
-    tabs.current[index]?.focus()
-  }
-
-  function handleTabKey(event: React.KeyboardEvent<HTMLButtonElement>, index: number) {
-    if (event.key === 'ArrowRight') selectPerspective((index + 1) % 3)
-    else if (event.key === 'ArrowLeft') selectPerspective((index + 2) % 3)
-    else if (event.key === 'Home') selectPerspective(0)
-    else if (event.key === 'End') selectPerspective(2)
-    else return
-    event.preventDefault()
-  }
 
   async function restartViewer() {
     if (restartInFlight.current) return
@@ -107,7 +89,6 @@ export function SpacejoyExperience() {
     failureInFlight.current = false
   }
 
-  const activePerspective = spacejoyStory.perspectives[perspective]
   const activeViewerSession = viewerSession.current
   const viewerAvailable = webGL === true && !reducedMotion
   const viewerActive = viewerAvailable && !failed && hasApproached
@@ -172,44 +153,14 @@ export function SpacejoyExperience() {
   return (
     <div className={styles.experience} ref={scope}>
       <div className={styles.toolbar}>
-        <div aria-label="Spacejoy role perspective" className={styles.perspectives} role="tablist">
-          {spacejoyStory.perspectives.map((item, index) => (
-            <button
-              aria-controls={`${id}-perspective`}
-              aria-selected={index === perspective}
-              className={styles.perspective}
-              id={`${id}-tab-${item.id}`}
-              key={item.id}
-              onClick={(event) => {
-                setImmediatePerspective(event.detail === 0)
-                setPerspective(index)
-              }}
-              onKeyDown={(event) => handleTabKey(event, index)}
-              ref={(node) => {
-                tabs.current[index] = node
-              }}
-              role="tab"
-              tabIndex={index === perspective ? 0 : -1}
-              type="button"
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
         <p className={styles.viewerNote}>{spacejoyStory.viewer.label}</p>
       </div>
 
-      <div
-        aria-labelledby={`${id}-tab-${activePerspective.id}`}
-        className={styles.viewerShell}
-        id={`${id}-perspective`}
-        role="tabpanel"
-        tabIndex={0}
-      >
+      <div aria-label={spacejoyStory.viewer.ariaLabel} className={styles.viewerShell} role="region">
         <SpacejoyPoster
-          label={activePerspective.label}
+          label={spacejoyStory.viewer.posterLabel}
           posterSrc={spacejoyStory.viewer.posterSrc}
-          summary={activePerspective.summary}
+          summary={spacejoyStory.viewer.posterSummary}
         />
 
         {viewerActive && !failed ? (
@@ -223,18 +174,15 @@ export function SpacejoyExperience() {
               className={styles.viewerLayer}
               data-activation="automatic"
               data-build={buildComplete ? 'complete' : 'assembling'}
-              data-perspective-transition={immediatePerspective ? 'instant' : 'animated'}
               data-ready={viewerReady}
               data-rendering={viewerPaused ? 'paused' : 'active'}
               data-viewer-layer
             >
               <DynamicViewer
-                immediatePerspective={immediatePerspective}
                 onError={() => void handleViewerFailure(activeViewerSession)}
                 onReady={() => setViewerReady(true)}
                 onSequenceComplete={() => setBuildComplete(true)}
                 paused={viewerPaused}
-                perspective={perspective}
               />
             </div>
           </ViewerErrorBoundary>
@@ -296,8 +244,32 @@ export function SpacejoyExperience() {
         </p>
       </div>
 
-      <p className={styles.caption}>{spacejoyStory.caption}</p>
-      <p className={styles.interactionNote}>{spacejoyStory.interactionNote}</p>
+      <div className={styles.viewerDescription}>
+        <p className={styles.caption}>{spacejoyStory.caption}</p>
+        <p className={styles.interactionNote}>{spacejoyStory.interactionNote}</p>
+      </div>
+
+      <section aria-labelledby="spacejoy-surfaces-title" className={surfaceStyles.surfaces}>
+        <div className={surfaceStyles.header}>
+          <p className={surfaceStyles.eyebrow}>{spacejoyStory.surfacesLabel}</p>
+          <h4 className={surfaceStyles.title} id="spacejoy-surfaces-title">
+            {spacejoyStory.surfacesTitle}
+          </h4>
+        </div>
+        <ol className={surfaceStyles.grid}>
+          {spacejoyStory.surfaces.map((surface, index) => (
+            <li className={surfaceStyles.item} key={surface.id}>
+              <span aria-hidden="true" className={surfaceStyles.index}>
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <p className={surfaceStyles.label}>{surface.label}</p>
+                <p className={surfaceStyles.summary}>{surface.summary}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   )
 }
